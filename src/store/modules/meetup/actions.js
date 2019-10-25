@@ -12,6 +12,20 @@ export function meetupSuccess(meetups) {
   };
 }
 
+export function meetupNextPageRequest(date, page) {
+  return {
+    type: '@meetup/NEXT_PAGE_REQUEST',
+    payload: { date, page },
+  };
+}
+
+export function meetupNextPageSuccess(meetups) {
+  return {
+    type: '@meetup/NEXT_PAGE_SUCCESS',
+    payload: { meetups },
+  };
+}
+
 export function meetupSubscribeRequest(id) {
   return {
     type: '@meetup/SUBSCRIBE_REQUEST',

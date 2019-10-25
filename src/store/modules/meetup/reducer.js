@@ -5,17 +5,42 @@ import { pt } from 'date-fns/esm/locale';
 const INITIAL_STATE = {
   meetups: [],
   subscriptions: [],
+  nextPage: false,
   loading: false,
 };
 
 export default function meetup(state = INITIAL_STATE, action) {
   return produce(state, draft => {
     switch (action.type) {
-      case '@meetup/REQUEST': {
+      case '@meetup/NEXT_PAGE_SUCCESS': {
+        const { meetups } = action.payload;
+
+        if (meetups.length < 10) {
+          draft.nextPage = false;
+        } else {
+          draft.nextPage = true;
+        }
+
+        const data = meetups.map(m => {
+          return {
+            ...m,
+            formatedDate: format(parseISO(m.date), "d 'de' MMMM 'às' HH:mm", {
+              locale: pt,
+            }),
+          };
+        });
+
+        draft.meetups.push(...data);
         break;
       }
       case '@meetup/SUCCESS': {
         const { meetups } = action.payload;
+
+        if (meetups.length < 10) {
+          draft.nextPage = false;
+        } else {
+          draft.nextPage = true;
+        }
 
         const data = meetups.map(m => {
           return {

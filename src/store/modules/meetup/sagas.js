@@ -7,6 +7,7 @@ import {
   meetupSubscriptionsSuccess,
   meetupUnsubscribeSuccess,
   meetupSubscribeFailure,
+  meetupNextPageSuccess,
 } from './actions';
 
 function* meetup({ payload }) {
@@ -20,6 +21,26 @@ function* meetup({ payload }) {
 
     yield put(meetupSuccess(response.data));
   } catch (error) {
+    // toast.error('falha ao requisitar meetups');
+  }
+}
+
+function* meetupNextPage({ payload }) {
+  console.tron.log('entrou next page');
+  try {
+    console.tron.log('entrou next page 4');
+    const { date, page } = payload;
+    console.tron.log('entrou next page 5');
+    console.tron.log([date, page]);
+    const response = yield call(
+      api.get,
+      date ? `meetups?date=${date}&page=${page}` : `meetups?page=${page}`
+    );
+
+    console.tron.log('entrou next page 2');
+    yield put(meetupNextPageSuccess(response.data));
+  } catch (error) {
+    console.tron.log('entrou next page 3');
     // toast.error('falha ao requisitar meetups');
   }
 }
@@ -78,6 +99,7 @@ function* subscriptionsMeetups() {
 
 export default all([
   takeLatest('@meetup/REQUEST', meetup),
+  takeLatest('@meetup/NEXT_PAGE_REQUEST', meetupNextPage),
   takeLatest('@meetup/SUBSCRIBE_REQUEST', subscribeMeetup),
   takeLatest('@meetup/UNSUBSCRIBE_REQUEST', unsubscribeMeetup),
   takeLatest('@meetup/SUBSCRIPTIONS_REQUEST', subscriptionsMeetups),

@@ -23,11 +23,10 @@ import Meetup from '~/components/Meetup';
 import {
   meetupRequest,
   meetupSubscribeRequest,
+  meetupNextPageRequest,
 } from '~/store/modules/meetup/actions';
 
 function Dashboard({ isFocused }) {
-  // const [meetups, setMeetups] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [date, setDate] = useState(new Date());
 
@@ -35,6 +34,7 @@ function Dashboard({ isFocused }) {
 
   const meetups = useSelector(state => state.meetup.meetups);
   const loading = useSelector(state => state.meetup.loading);
+  const nextPage = useSelector(state => state.meetup.nextPage);
 
   const dateFormated = useMemo(
     () => format(date, "dd 'de' MMMM", { locale: pt }),
@@ -51,9 +51,8 @@ function Dashboard({ isFocused }) {
   }, [date]);
 
   function handleNextPage() {
-    console.tron.log(page);
-    /* dispatch(meetupRequest(date, page + 1));
-    setPage(page + 1); */
+    dispatch(meetupNextPageRequest(format(date, 'yyyy-MM-dd'), page + 1));
+    setPage(page + 1);
   }
 
   useEffect(() => {
@@ -68,10 +67,12 @@ function Dashboard({ isFocused }) {
   }
 
   function handleAddDay() {
+    setPage(1);
     setDate(addDays(date, 1));
   }
 
   function handleSubDay() {
+    setPage(1);
     setDate(subDays(date, 1));
   }
 
@@ -106,9 +107,8 @@ function Dashboard({ isFocused }) {
           <ListMeetups
             data={meetups}
             keyExtractor={item => String(item.id)}
-            onEndReachedThreshold={0.2} // Carrega mais itens quando chegar em 20% do fim
+            onEndReachedThreshold={nextPage ? 0.2 : -1} // Carrega mais itens quando chegar em 20% do fim
             onEndReached={handleNextPage} // Função que carrega mais itens
-            refreshing={refreshing}
             renderItem={({ item }) => (
               <Meetup meetup={item} onPress={() => handleSubscribe(item.id)} />
             )}
@@ -122,7 +122,6 @@ function Dashboard({ isFocused }) {
             </Text>
           </View>
         )}
-        {console.tron.log(meetups.length)}
       </Container>
     </Background>
   );
